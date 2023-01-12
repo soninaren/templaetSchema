@@ -1,0 +1,111 @@
+{
+    "author": "Microsoft",
+    "name": "Azure Blob Storage trigger",
+    "description": "$BlobTrigger_description",
+    "language": "python",
+    "programmingModel": "v2",
+    "jobs": [
+        {
+            "Name": "Create a function in a new file",
+            "condition": {
+                "mode": "Create"
+            },
+            "output": {
+                "Type": "Create"
+            },
+            "bindingConfiguration": {
+                "SourceFile": "function_app.py",
+                "configuration": [
+                    {
+                        "replaces": "%$AuthLevelValue$%",
+                        "args": {
+                            "bindingType": "httpTrigger",
+                            "configName": "authLevel"
+                        }
+                    },
+                    {
+                        "replaces": "%$route$%",
+                        "args": {
+                            "bindingType": "httpTrigger",
+                            "configName": "route"
+                        }
+                    }
+                ]
+            },
+            "Actions": [
+                {
+                    "actionId": "TextReplace",
+                    "description": "Get function name from the user",
+                    "continueOnError": "false",
+                    "placeHolder": "%$FunctionName$%",
+                    "defaultValue" : "",
+                    "content" :
+                    {
+                        "Type" : "UserPrompt",
+                        "validators": [
+                            {
+                              "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
+                              "errorText": ""
+                            }
+                          ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Add a function to an existing file",
+            "condition": {
+                "mode": "Append"
+            },
+            "output": {
+                "Type": "AppendToFile"
+            },
+            "bindingConfiguration": {
+                "SourceFile": "function_app_append.py",
+                "configuration": [
+                    {
+                        "replaces": "%$route$%",
+                        "args": {
+                            "bindingType": "httpTrigger",
+                            "configName": "route"
+                        }
+                    }
+                ]
+            },
+            "Actions": [
+                {
+                    "actionId": "TextReplace",
+                    "description": "Add code to function_app by replacing codeBody with code from function_app_append",
+                    "continueOnError": "false",
+                    "source" : {
+                        "SourceFileName" : "{TargetFileName}",
+                        "SourceType" : "File"
+                    },
+                    "placeHolder": "%$FunctionName$%",
+                    "content" :
+                    {
+                        "Type" : "UserPrompt",
+                        "validators": [
+                            {
+                              "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
+                              "errorText": ""
+                            }
+                          ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "run post actions",
+            "Actions": [
+                {
+                    "actionId": "ShowMarkdownPreview",
+                    "description": "Show contents of markdown file",
+                    "continueOnError": "true",
+                    "instructions" : "open documentation from the link herem",
+                    "MarkdownFile" : "http_trigger_template.md"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,101 @@
+{
+    "author": "John doe",
+    "name": "Name of template", // Name template that will be shown in tooling list
+    "description": "$BlobTrigger_description", // corresponding label in the resx file
+    "language": "python",
+    "programmingModel": "v2",
+    "jobs": [
+        {
+            "name": "Create a function in a new file",
+            "scenario": "CreateNewFile", // CreateNewFile | AppendToFile
+            "sourceTemplate": "function_app.py", // template file where binding configuration is applied and job actions are performed on
+            "bindingConfigurations": [
+                {
+                    "bindingType": "httpTrigger",
+                    "settings": [
+                        {
+                            "name": "authLevel",
+                            "replaces": "%$AuthLevelValue$%"
+                        },
+                        {
+                            "name": "route",
+                            "replaces": "%$route$%"
+                        }
+                    ]
+                }
+            ],
+            "actions": [
+                {
+                    "actionId": "TextReplace",
+                    "description": "Get function name from the user",
+                    "continueOnError": "false",
+                    "placeHolder": "%$FunctionName$%",
+                    "defaultValue": "",
+                    "content": {
+                        "Type": "UserPrompt",
+                        "validators": [
+                            {
+                                "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
+                                "errorText": ""
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Add a function to an existing file",
+            "condition": {
+                "Scenario": "AppendToFile"
+            },
+            "output": {
+                "Type": "AppendToFile"
+            },
+            "bindingConfiguration": {
+                "SourceFile": "function_app_append.py",
+                "configuration": [
+                    {
+                        "replaces": "%$route$%",
+                        "args": {
+                            "bindingType": "httpTrigger",
+                            "configName": "route"
+                        }
+                    }
+                ]
+            },
+            "Actions": [
+                {
+                    "actionId": "TextReplace",
+                    "description": "Add code to function_app by replacing codeBody with code from function_app_append",
+                    "continueOnError": "false",
+                    "source": {
+                        "SourceFileName": "{TargetFileName}",
+                        "SourceType": "File"
+                    },
+                    "placeHolder": "%$FunctionName$%",
+                    "content": {
+                        "Type": "UserPrompt",
+                        "validators": [
+                            {
+                                "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
+                                "errorText": ""
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "run post actions",
+            "Actions": [
+                {
+                    "actionId": "ShowMarkdownPreview",
+                    "description": "Show contents of markdown file",
+                    "continueOnError": "true",
+                    "instructions": "open documentation from the link herem",
+                    "MarkdownFile": "http_trigger_template.md"
+                }
+            ]
+        }
+    ]
+}
