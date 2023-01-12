@@ -11,17 +11,14 @@
             "sourceTemplate": "function_app.py", // template file where binding configuration is applied and job actions are performed on
             "bindingConfigurations": [
                 {
-                    "bindingType": "httpTrigger",
-                    "settings": [
-                        {
-                            "name": "authLevel",
-                            "replaces": "%$AuthLevelValue$%"
-                        },
-                        {
-                            "name": "route",
-                            "replaces": "%$route$%"
-                        }
-                    ]
+                    "placeholder": "%%AuthLevelValue%%",
+                    "triggerType": "httpTrigger",
+                    "setting": "authLevel"
+                },
+                {
+                    "placeholder": "%%route%%",
+                    "triggerType": "httpTrigger",
+                    "setting": "route"
                 }
             ],
             "actions": [
