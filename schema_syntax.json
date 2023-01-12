@@ -9,7 +9,7 @@
             "name": "Create a function in a new file",
             "scenario": "CreateNewFile", // CreateNewFile | AppendToFile
             "sourceTemplate": "function_app.py", // template file where binding configuration is applied and job actions are performed on
-            "bindingConfigurations": [
+            "bindingConfigurations": [          // optional
                 {
                     "bindingType": "httpTrigger",
                     "settings": [
@@ -26,12 +26,21 @@
             ],
             "actions": [
                 {
-                    "actionId": "TextReplace",
-                    "description": "Get function name from the user",
-                    "continueOnError": "false",
-                    "placeHolder": "%$FunctionName$%",
-                    "defaultValue": "",
-                    "content": {
+                    "type": "TextReplace",                              // replaces text in the source file
+                    "description": "Get function name from the user",  // optional, human readable description
+                    "continueOnError": "false",                         // Continue on error, if an error occurs
+                                                                            // if false
+                                                                                // 1 not create the template file
+                                                                                // 2. will show error text to the user
+                                                                                // 3 not execute any subsequent jobs or actions
+                                                                            // if true
+                                                                                // 1 create the template file
+                                                                                // 2. will show error text to the user
+                                                                                // 3 will execute subsequent jobs or actions
+                    "ErrorText" : "",                                    // to be shown to user in case of error
+                    "placeHolder": "%$FunctionName$%",                  // value to be replaced
+                    "defaultValue": "",                                 // default value in case user does not provide anything
+                    "replacementContent": {
                         "Type": "UserPrompt",
                         "validators": [
                             {
