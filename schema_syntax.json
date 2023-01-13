@@ -3,7 +3,6 @@
     "name": "Name of template", // Name template that will be shown in tooling list
     "description": "$BlobTrigger_description", // corresponding label in the resx file
     "language": "python",
-    "programmingModel": "v2",
     "jobs": [
         {
             "name": "Create a function in a new file",
@@ -79,8 +78,9 @@
                         "SourceType": "File"
                     },
                     "placeHolder": "%$FunctionName$%",
-                    "content": {
-                        "Type": "UserPrompt",
+                    "defaultValue" : "functionName",
+                    "value": {
+                        "source": "UserPrompt",
                         "validators": [
                             {
                                 "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
