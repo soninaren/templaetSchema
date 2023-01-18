@@ -1,40 +1,33 @@
-# Azure Functions: HTTP Trigger in Python
+# Azure Functions: Timer Trigger in Python
 
-## HTTP Trigger
+## Timer Trigger
 
-The HTTP trigger lets you invoke a function with an HTTP request. You can use an HTTP trigger to build serverless APIs and respond to webhooks.
+A timer trigger lets you run a function on a schedule.
 
 ## Using the Template
 
-Following is an example code snippet for HTTP Trigger using the [Python programming model V2](https://aka.ms/pythonprogrammingmodel) (currently in Preview).
+Following is an example code snippet for Timer Trigger using the [Python programming model V2](https://aka.ms/pythonprogrammingmodel) (currently in Preview).
 
 ```python
-import azure.functions as func
+import datetime
+
 import logging
 
-app = func.FunctionApp(auth_level=func.AuthLevel.ANONYMOUS)
+import azure.functions as func
 
-@app.function_name(name="HttpTrigger1")
-@app.route(route="hello")
-def test_function(req: func.HttpRequest) -> func.HttpResponse:
-     logging.info('Python HTTP trigger function processed a request.')
+app = func.FunctionApp()
 
-     name = req.params.get('name')
-     if not name:
-        try:
-            req_body = req.get_json()
-        except ValueError:
-            pass
-        else:
-            name = req_body.get('name')
+@app.function_name(name="mytimer")
+@app.schedule(schedule="0 */5 * * * *", arg_name="mytimer", run_on_startup=True,
+              use_monitor=False) 
+def test_function(mytimer: func.TimerRequest) -> None:
+    utc_timestamp = datetime.datetime.utcnow().replace(
+        tzinfo=datetime.timezone.utc).isoformat()
 
-     if name:
-        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
-     else:
-        return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
-             status_code=200
-        )
+    if mytimer.past_due:
+        logging.info('The timer is past due!')
+
+    logging.info('Python timer trigger function ran at %s', utc_timestamp)
 ```
 
 To run the code snippet generated through the command palette, note the following:
@@ -42,8 +35,6 @@ To run the code snippet generated through the command palette, note the followin
 - The function application is defined and named `app`.
 - Confirm that the parameters within the trigger reflect values that correspond with your storage account.
 - The name of the file must be `function_app.py`.
-  
-Note that HTTP output bindings are also supported in Azure Functions. To learn more, see [Azure Functions HTTP triggers and bindings overview](https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-http-webhook?tabs=in-process%2Cfunctionsv2&pivots=programming-language-python)
 
 ## Programming Model V2 (Preview)
 
