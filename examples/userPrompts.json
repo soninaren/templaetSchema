@@ -69,7 +69,7 @@
         "value": "string",
         "resource": "Storage",
         "label": "$variables_storageConnStringLabel",
-        "help": "$variables_appSettingsHelp",
+        "help": "$variables_appSettingsHelp"
     },
     {
         "name": "blobTrigger-path",
