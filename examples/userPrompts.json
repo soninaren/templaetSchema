@@ -1,0 +1,42 @@
+[
+    {
+        "name": "httpTrigger-route",
+        "type": "string",
+        "label": "$httpTrigger_route_label",
+        "help": "$httpTrigger_route_help"
+    },
+    {
+        "name": "trigger-functionName",
+        "type": "string",
+        "label": "Provide a function name",
+        "help": "Name of the function you want to",
+        "validators": [
+            {
+              "expression": "^[a-zA-Z][a-zA-Z0-9]{0,127}$",
+              "errorText": "[variables('parameterName')]"
+            }
+          ]
+    },
+    {
+        "name": "httpTrigger-authLevel",
+        "value": "enum",
+        "required": true,
+        "defaultValue": "function",
+        "enum": [
+            {
+                "value": "function",
+                "display": "Function"
+            },
+            {
+                "value": "anonymous",
+                "display": "Anonymous"
+            },
+            {
+                "value": "admin",
+                "display": "Admin"
+            }
+        ],
+        "label": "$httpTrigger_authLevel_label",
+        "help": "$httpTrigger_authLevel_help"
+    }
+]
