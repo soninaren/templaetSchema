@@ -1,113 +1,47 @@
 {
-    "author": "Katy Shimizu",
-    "name": "Timer Trigger",    // what is this? The name of the trigger?
-    "description": "$TimerTrigger_description", // see resx file
-    "programmingModel": "v2",
-    "language": "python",
-    "jobs": [
+    "author": "Katy Shimizu",                               // Primary contact for this template (author/maintainer/owner/etc).
+    // TODO: Is "name" a display name or just a human readable tag? If display name, shouldn't it be a resx pointer?
+    "name": "<Trigger> Name",                               // If a resx pointer (ex. $Trigger_name), could be displayed in UI.
+    "description": "$Trigger_description",                  // Resx pointer to localized short description of trigger functionality.
+    "programmingModel": "v2",                               // "v1" | "v2". v1 = legacy; v2 = Stein.
+    "language": "python",                                   // Programming language. ex. python, dotnet, node, powershell.
+    "jobs": [                                               // Each 'job' is a collection of actions associated with a command or 'flow.'
         {
-            "name": "Create New Project with Timer Function",   // human readable description (not display text)
-            "input": {
-                    "userCommand": "createNewApp",
-                    "assignTo": "$(APP_FILENAME)"
-                    // should inputs be a collection?
-                    // app name always function_app.py?
+            "name": "Human-Readable Trigger Flow Name",     // If a resx pointer (ex. $Trigger_Flow_name), could be displayed in UI.
+            "condition": {                                  // Job-level condition; ex. to determine whether to enable it as an option.
+                "name": "SHOW_V2_TEMPLATES",                // Variable name - for example, an environment variable.
+                "expectedValue": "true"                     // Variable value for which this condition is true.
             },
-            "actions": [
-                "getScheduleValue",
-                "getFunctionName",
-                "readFileContent_FunctionBody",
-                "replaceText_FunctionBody",
-                "readFileContent_FunctionApp",
-                "replaceText_FunctionApp",
-                "writeFile_FunctionApp",
+            "input": {
+                // TODO: note on who defines userCommand values - template creators?
+                "userCommand": "createNewApp",              // Value tooling can match on to filter which job(s) to run for a flow.
+                "assignTo": "$(APP_FILENAME)"               // Key for initial input value. Actions can prompt for further inputs, ex. binding settings.
+                // ex. in the append scenario, this could be 'function_app.py' or the selected file
+            },
+            "actions": [                                    // Keys for action definitions (full action definitions below).
+                "getBindingParamValue",                     // NOTE: List actions in order of operation.
+                "readFileContent",
+                "replaceTextInFile",
+                "writeFile",
                 "showMarkdownPreview"
             ]
         },
-        {
-            "name": "Append Timer Function to File",   // human readable description (not display text)
-            "input": [
-                {
-                    "userCommand": "appendToFile",
-                    "assignTo": "$(SELECTED_FILENAME)"
-                    // ex. in VS Code this could be app.py or the selected file
-                }
-            ],
-            "actions": [
-                "getScheduleValue",
-                "getFunctionNameAction",
-                "readFileContent_FunctionBody",
-                "replaceText_FunctionBody",
-                "readFileContent_SelectedFile",
-                "appendFileContent_FunctionApp",
-                "showMarkdownPreview"
-            ]
-        }
     ],
-    "actions": [
-        { // get binding setting - stores in $(SCHEDULE_INPUT)
-            "name": "getScheduleValue",
-            "type": "UserInput",
-            "assignTo": "$(SCHEDULE_INPUT)",
-            "paramId": "timerTrigger-schedule",  // convention: <type>-<setting.name> (see bindings.json)
-            "defaultValue": "0 5/* * * * *"
-        },
-        { // get function name - stores in $(FUNCTION_NAME_INPUT)
-            "name": "getFunctionName",
-            "type": "UserInput",
-            "assignTo": "$(FUNCTION_NAME_INPUT)",
-            "paramId": "trigger-functionName", // is this the same as the name setting in bindings.json,
-            "defaultValue": "MyTimerFunction"
-        },
-        { // read content of function_body.py into $(TIMER_FUNCTION_BODY)
-            "name": "readFileContent_FunctionBody",
-            "type": "ReadFromFile",
-            "assignTo": "$(TIMER_FUNCTION_BODY)",
-            "filePath": "function_body.py"
-        },
-        { // replace placeholders in in function_body.py
-            "name": "replaceText_FunctionBody",
-            "type": "ReplaceTokensInText",
-            "assignTo": "$(TIMER_FUNCTION_BODY)",
-            "source": "$(TIMER_FUNCTION_BODY)"
-        },
-        { // read content of function_app.py into $(FUNCTION_APP)
-            "name": "readFileContent_FunctionApp",
-            "type": "ReadFromFile",
-            "assignTo": "$(FUNCTION_APP)",
-            "filePath": "function_app.py"
-        },
-        { // read content of selected file into $(FUNCTION_APP)
-            "name": "readFileContent_SelectedFile",
-            "type": "ReadFromFile",
-            "assignTo": "$(FUNCTION_APP)",
-            "filePath": "$(SELECTED_FILENAME)"
-        },
-        { // replace $(TIMER_FUNCTION_BODY) in function_app.py
-            "name": "replaceText_FunctionApp",
-            "type": "ReplaceTokensInText",
-            "assignTo": "$(FUNCTION_APP_TRANSFORMED)",
-            "source": "$(FUNCTION_APP)" // source text is text that has placeholders
-        },
-        {   // on create, replace previously defined placeholder values with text
-            "name": "writeFile_FunctionApp",
-            "type": "WriteToFile",
-            "filePath": "$(APP_FILENAME)",  // relative path
-            "source": "$(FUNCTION_APP_TRANSFORMED)"
-        },
+    "actions": [                                            // Full action definitions. An action can be used by more than one job.
         {
-            "name": "appendFileContent_FunctionApp",
-            "type": "AppendToFile",
-            "createIfNotExists" : false,    // if false, throw error
-            "source": "$(FUNCTION_APP_TRANSFORMED)",
-            "filePath" : "$(SELECTED_FILENAME)",
-            "continueOnError" : false,
-            "errorText" : "Unable to add template"
-        },
-        {
-            "name": "showMarkdownPreview",
-            "type": "ShowMarkdownPreview",
-            "filePath": "http_trigger_template.md"
+            // TODO: Change 'name' to 'key'?
+            // Common Action Properties
+            "name": "getBindingParamValue",                 // Arbitrary value for lookup from job(s).
+            "type": "UserInput",                            // Corresponds to entry in actions_schema.json.
+            "condition": {                                  // Action-level condition. If undefined, action always runs.
+                "name": "SOME_FLAG",
+                "expectedValue": "true"
+            },
+            "continueOnError": "false",                     // Whether to continue job execution on error.
+            "errorText": "$Trigger_param_error",            // Resx pointer; text to show user on error. ex. manual instructions.
+            // Action Type Specific Properties
+            "property_one": "foo",                          // These vary by the specific action type. See actions_schema.json for examples.              
+            "property_two": "bar"
         }
     ]
 }
